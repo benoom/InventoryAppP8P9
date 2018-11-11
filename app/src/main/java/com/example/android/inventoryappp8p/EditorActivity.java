@@ -315,13 +315,13 @@ public class EditorActivity extends AppCompatActivity implements
 
             // Extract out the value from the Cursor for the given column index
             String name = cursor.getString(nameColumnIndex);
-            int price = cursor.getInt(priceColumnIndex);
+            double price = cursor.getInt(priceColumnIndex);
             String supplier = cursor.getString(supplierColumnIndex);
             String phone = cursor.getString(phoneColumnIndex);
 
             // Update the views on the screen with the values from the database
             mNameEditText.setText(name);
-            mPricedEditText.setText(Integer.toString(price));
+            mPricedEditText.setText(Double.toString(price));
             mSupplierEditText.setText(supplier);
             mPhoneEditText.setText(phone);
 

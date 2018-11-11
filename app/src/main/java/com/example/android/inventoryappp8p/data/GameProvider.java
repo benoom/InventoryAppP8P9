@@ -143,7 +143,7 @@ public class GameProvider extends ContentProvider {
         }
 
         // Check that the game price is not null
-        Integer price = values.getAsInteger(GameEntry.COLUMN_GAME_PRICE);
+        Double price = values.getAsDouble(GameEntry.COLUMN_GAME_PRICE);
         if (price == null) {
             throw new IllegalArgumentException("Game requires valid price");
         }

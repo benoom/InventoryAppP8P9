@@ -41,7 +41,7 @@ public class GameDbHelper extends SQLiteOpenHelper {
         String SQL_CREATE_GAMES_TABLE = "CREATE TABLE " + GameEntry.TABLE_NAME + " ("
                 + GameEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + GameEntry.COLUMN_GAME_NAME + " TEXT NOT NULL, "
-                + GameEntry.COLUMN_GAME_PRICE + " INTEGER NOT NULL, "
+                + GameEntry.COLUMN_GAME_PRICE + " DOUBLE NOT NULL, "
                 + GameEntry.COLUMN_GAME_SUPPLIER + " TEXT NOT NULL, "
                 + GameEntry.COLUMN_GAME_SUPPLIER_PHONE + " TEXT NOT NULL);";
 

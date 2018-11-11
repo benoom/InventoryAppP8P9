@@ -79,7 +79,7 @@ public final class GameContract {
         /**
          * Price of the game.
          * <p>
-         * Type: INTEGER
+         * Type: DOUBLE
          */
         public final static String COLUMN_GAME_PRICE = "price";
 

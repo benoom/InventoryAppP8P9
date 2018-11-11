@@ -29,7 +29,7 @@
 
         <provider
             android:name=".data.GameProvider"
-            android:authorities="com.example.android.inventoryappp8p"
+            android:authorities="com.example.android.inventoryappp8p9"
             android:exported="false" />
     </application>
 
