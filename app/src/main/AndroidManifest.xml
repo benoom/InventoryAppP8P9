@@ -18,8 +18,19 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".NewItemActivity"
+            android:label="@string/new_item_title"
+            android:parentActivityName=".CatalogActivity"
+            android:theme="@style/EditorTheme">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CatalogActivity" />
+        </activity>
+        <activity
             android:name=".EditorActivity"
             android:parentActivityName=".CatalogActivity"
+            android:label="@string/edit_item_title"
             android:theme="@style/EditorTheme">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
@@ -32,5 +43,5 @@
             android:authorities="com.example.android.inventoryappp8p9"
             android:exported="false" />
     </application>
-
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 </manifest>

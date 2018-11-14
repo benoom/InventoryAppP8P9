@@ -84,6 +84,13 @@ public final class GameContract {
         public final static String COLUMN_GAME_PRICE = "price";
 
         /**
+         * Quantity of the game in stock
+         * <p>
+         * Type: INTEGER
+         */
+        public final static String COLUMN_GAME_QUANTITY = "quantity";
+
+        /**
          * Supplier of the game.
          * <p>
          * Type: TEXT

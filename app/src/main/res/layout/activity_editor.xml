@@ -40,6 +40,13 @@
                 android:hint="@string/hint_game_price"
                 android:inputType="textCapWords" />
 
+            <!-- Quantity field -->
+            <EditText
+                android:id="@+id/edit_game_quantity"
+                style="@style/EditorFieldStyle"
+                android:hint="@string/hint_game_quantity"
+                android:inputType="number" />
+
         </LinearLayout>
     </LinearLayout>
 
@@ -69,13 +76,47 @@
                 android:hint="@string/hint_game_supplier"
                 android:inputType="textCapWords" />
 
-            <!-- Price field -->
-            <EditText
-                android:id="@+id/edit_supplier_phone"
-                style="@style/EditorFieldStyle"
-                android:hint="@string/hint_supplier_phone"
-                android:inputType="phone" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <!-- Price field -->
+                <EditText
+                    android:id="@+id/edit_supplier_phone"
+                    style="@style/EditorFieldStyle"
+                    android:hint="@string/hint_supplier_phone"
+                    android:inputType="phone" />
+
+                <ImageButton
+                    android:id="@+id/call_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"
+                    android:src="@drawable/baseline_phone" />
+            </LinearLayout>
 
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/restock_item_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="8dp"
+            android:text="@string/game_restock" />
+
+        <Button
+            android:id="@+id/sell_item_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="8dp"
+            android:text="@string/game_sold" />
     </LinearLayout>
 </LinearLayout>

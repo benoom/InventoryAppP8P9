@@ -11,8 +11,6 @@ import com.example.android.inventoryappp8p.data.GameContract.GameEntry;
  */
 public class GameDbHelper extends SQLiteOpenHelper {
 
-    public static final String LOG_TAG = GameDbHelper.class.getSimpleName();
-
     /**
      * Name of the database file
      */
@@ -42,6 +40,7 @@ public class GameDbHelper extends SQLiteOpenHelper {
                 + GameEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + GameEntry.COLUMN_GAME_NAME + " TEXT NOT NULL, "
                 + GameEntry.COLUMN_GAME_PRICE + " DOUBLE NOT NULL, "
+                + GameEntry.COLUMN_GAME_QUANTITY + " INTEGER NOT NULL, "
                 + GameEntry.COLUMN_GAME_SUPPLIER + " TEXT NOT NULL, "
                 + GameEntry.COLUMN_GAME_SUPPLIER_PHONE + " TEXT NOT NULL);";
 

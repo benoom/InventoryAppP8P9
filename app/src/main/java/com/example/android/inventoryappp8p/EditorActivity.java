@@ -17,7 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.android.inventoryappp8p.data.GameContract.GameEntry;
@@ -47,6 +49,11 @@ public class EditorActivity extends AppCompatActivity implements
      * EditText field to enter the game's price
      */
     private EditText mPricedEditText;
+
+    /**
+     * EditText field to enter the game's current quantity
+     */
+    private EditText mQuantityEditText;
 
     /**
      * EditText field to enter the games's supplier
@@ -79,33 +86,41 @@ public class EditorActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+        Button refillButton = findViewById(R.id.restock_item_button);
+        Button sellButton = findViewById(R.id.sell_item_button);
+        ImageButton callButton = findViewById(R.id.call_button);
+
+        refillButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                addToQuantity();
+            }
+        });
+
+        sellButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                removeFromQuantity();
+            }
+        });
+
+        callButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                makeCall();
+            }
+        });
 
         // Examine the intent that was used to launch this activity,
         // in order to figure out if we're creating a new game or editing an existing one.
         Intent intent = getIntent();
         mCurrentGameUri = intent.getData();
 
-        // If the intent DOES NOT contain a game content URI, then we know that we are
-        // creating a new game.
-        if (mCurrentGameUri == null) {
-            // This is a new game, so change the app bar to say "Add a Game"
-            setTitle(getString(R.string.editor_activity_title_new_game));
-
-            // Invalidate the options menu, so the "Delete" menu option can be hidden.
-            // (It doesn't make sense to delete a game that hasn't been created yet.)
-            invalidateOptionsMenu();
-        } else {
-            // Otherwise this is an existing game, so change app bar to say "Edit Game"
-            setTitle(getString(R.string.editor_activity_title_edit_game));
-
-            // Initialize a loader to read the game data from the database
-            // and display the current values in the editor
+        if (mCurrentGameUri != null) {
             getLoaderManager().initLoader(EXISTING_GAME_LOADER, null, this);
         }
 
         // Find all relevant views that we will need to read user input from
         mNameEditText = findViewById(R.id.edit_game_name);
         mPricedEditText = findViewById(R.id.edit_game_price);
+        mQuantityEditText = findViewById(R.id.edit_game_quantity);
         mSupplierEditText = findViewById(R.id.edit_supplier);
         mPhoneEditText = findViewById(R.id.edit_supplier_phone);
 
@@ -114,6 +129,7 @@ public class EditorActivity extends AppCompatActivity implements
         // or not, if the user tries to leave the editor without saving.
         mNameEditText.setOnTouchListener(mTouchListener);
         mPricedEditText.setOnTouchListener(mTouchListener);
+        mQuantityEditText.setOnTouchListener(mTouchListener);
         mSupplierEditText.setOnTouchListener(mTouchListener);
         mPhoneEditText.setOnTouchListener(mTouchListener);
     }
@@ -126,6 +142,7 @@ public class EditorActivity extends AppCompatActivity implements
         // Use trim to eliminate leading or trailing white space
         String nameString = mNameEditText.getText().toString().trim();
         String priceString = mPricedEditText.getText().toString().trim();
+        String quantityString = mQuantityEditText.getText().toString().trim();
         String supplierString = mSupplierEditText.getText().toString().trim();
         String phoneString = mPhoneEditText.getText().toString().trim();
 
@@ -133,51 +150,66 @@ public class EditorActivity extends AppCompatActivity implements
         // and check if all the fields in the editor are blank
         if (mCurrentGameUri == null &&
                 TextUtils.isEmpty(nameString) && TextUtils.isEmpty(priceString) &&
-                TextUtils.isEmpty(supplierString) && TextUtils.isEmpty(phoneString)) {
+                TextUtils.isEmpty(quantityString) && TextUtils.isEmpty(supplierString) &&
+                TextUtils.isEmpty(phoneString)) {
 
             // Since no fields were modified, we can return early without creating a new game.
             // No need to create ContentValues and no need to do any ContentProvider operations.
             return;
         }
 
-        // Create a ContentValues object where column names are the keys,
-        // and game attributes from the editor are the values.
         ContentValues values = new ContentValues();
-        values.put(GameEntry.COLUMN_GAME_NAME, nameString);
-        values.put(GameEntry.COLUMN_GAME_PRICE, priceString);
-        values.put(GameEntry.COLUMN_GAME_SUPPLIER, supplierString);
-        values.put(GameEntry.COLUMN_GAME_SUPPLIER_PHONE, phoneString);
 
-        // Determine if this is a new or existing game by checking if mCurrentGameUri is null or not
-        if (mCurrentGameUri == null) {
-            // This is a NEW game, so insert a new game into the provider,
-            // returning the content URI for the new game.
-            Uri newUri = getContentResolver().insert(GameEntry.CONTENT_URI, values);
-
-            // Show a toast message depending on whether or not the insertion was successful.
-            if (newUri == null) {
-                // If the new content URI is null, then there was an error with insertion.
-                Toast.makeText(this, getString(R.string.editor_insert_game_failed),
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                // Otherwise, the insertion was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_insert_game_successful),
-                        Toast.LENGTH_SHORT).show();
-            }
+        if (!TextUtils.isEmpty(nameString)) {
+            values.put(GameEntry.COLUMN_GAME_NAME, nameString);
         } else {
-            // Otherwise this is an EXISTING game, so update the game with content URI: mCurrentGameUri
-            // and pass in the new ContentValues. Pass in null for the selection and selection args
-            // because mCurrentGameUri will already identify the correct row in the database that
-            // we want to modify.
-            int rowsAffected = getContentResolver().update(mCurrentGameUri, values, null, null);
+            Toast.makeText(this, getString(R.string.update_name),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
 
-            // Show a toast message depending on whether or not the update was successful.
+        int price = 0;
+        if (!TextUtils.isEmpty(priceString)) {
+            price = Integer.parseInt(priceString);
+            values.put(GameEntry.COLUMN_GAME_PRICE, price);
+        } else {
+            Toast.makeText(this, getString(R.string.update_price),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (!TextUtils.isEmpty(supplierString)) {
+            values.put(GameEntry.COLUMN_GAME_SUPPLIER, supplierString);
+        } else {
+            Toast.makeText(this, getString(R.string.update_supplier),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (!TextUtils.isEmpty(phoneString)) {
+            values.put(GameEntry.COLUMN_GAME_SUPPLIER_PHONE, phoneString);
+        } else {
+            Toast.makeText(this, getString(R.string.update_phone),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        int quantity = 0;
+        if (!TextUtils.isEmpty(quantityString)) {
+            quantity = Integer.parseInt(quantityString);
+            values.put(GameEntry.COLUMN_GAME_QUANTITY, quantity);
+        } else {
+            Toast.makeText(this, getString(R.string.update_quantity),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (mCurrentGameUri != null) {
+
+            int rowsAffected = getContentResolver().update(mCurrentGameUri, values, null, null);
             if (rowsAffected == 0) {
-                // If no rows were affected, then there was an error with the update.
                 Toast.makeText(this, getString(R.string.editor_update_game_failed),
-                        Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_LONG).show();
             } else {
-                // Otherwise, the update was successful and we can display a toast.
                 Toast.makeText(this, getString(R.string.editor_update_game_successful),
                         Toast.LENGTH_SHORT).show();
             }
@@ -189,21 +221,6 @@ public class EditorActivity extends AppCompatActivity implements
         // Inflate the menu options from the res/menu/menu_editor.xml file.
         // This adds menu items to the app bar.
         getMenuInflater().inflate(R.menu.menu_editor, menu);
-        return true;
-    }
-
-    /**
-     * This method is called after invalidateOptionsMenu(), so that the
-     * menu can be updated (some menu items can be hidden or made visible).
-     */
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        // If this is a new game, hide the "Delete" menu item.
-        if (mCurrentGameUri == null) {
-            MenuItem menuItem = menu.findItem(R.id.action_delete);
-            menuItem.setVisible(false);
-        }
         return true;
     }
 
@@ -285,6 +302,7 @@ public class EditorActivity extends AppCompatActivity implements
                 GameEntry._ID,
                 GameEntry.COLUMN_GAME_NAME,
                 GameEntry.COLUMN_GAME_PRICE,
+                GameEntry.COLUMN_GAME_QUANTITY,
                 GameEntry.COLUMN_GAME_SUPPLIER,
                 GameEntry.COLUMN_GAME_SUPPLIER_PHONE};
 
@@ -310,18 +328,21 @@ public class EditorActivity extends AppCompatActivity implements
             // Find the columns of game attributes that we're interested in
             int nameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_NAME);
             int priceColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_PRICE);
+            int quantityColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_QUANTITY);
             int supplierColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_SUPPLIER);
             int phoneColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_SUPPLIER_PHONE);
 
             // Extract out the value from the Cursor for the given column index
             String name = cursor.getString(nameColumnIndex);
-            double price = cursor.getInt(priceColumnIndex);
+            double price = cursor.getDouble(priceColumnIndex);
+            int quantity = cursor.getInt(quantityColumnIndex);
             String supplier = cursor.getString(supplierColumnIndex);
             String phone = cursor.getString(phoneColumnIndex);
 
             // Update the views on the screen with the values from the database
             mNameEditText.setText(name);
             mPricedEditText.setText(Double.toString(price));
+            mQuantityEditText.setText(Integer.toString(quantity));
             mSupplierEditText.setText(supplier);
             mPhoneEditText.setText(phone);
 
@@ -333,6 +354,7 @@ public class EditorActivity extends AppCompatActivity implements
         // If the loader is invalidated, clear out all the data from the input fields.
         mNameEditText.setText("");
         mPricedEditText.setText("");
+        mQuantityEditText.setText("");
         mSupplierEditText.setText("");
         mPhoneEditText.setText("");
     }
@@ -420,5 +442,31 @@ public class EditorActivity extends AppCompatActivity implements
 
         // Close the activity
         finish();
+    }
+
+    private void addToQuantity() {
+        String quantityString = mQuantityEditText.getText().toString();
+        int quantityEdit = Integer.parseInt(quantityString);
+        quantityEdit++;
+        quantityString = String.valueOf(quantityEdit);
+        mQuantityEditText.setText(quantityString);
+    }
+
+    private void removeFromQuantity() {
+        String quantityString = mQuantityEditText.getText().toString();
+        int quantityEdit = Integer.parseInt(quantityString);
+        quantityEdit = quantityEdit - 1;
+        if (quantityEdit < 0) {
+            quantityEdit = 0;
+            Toast.makeText(this, getString(R.string.quantity_low_limit), Toast.LENGTH_SHORT).show();
+        }
+        quantityString = String.valueOf(quantityEdit);
+        mQuantityEditText.setText(quantityString);
+    }
+
+    private void makeCall() {
+        String phoneNumberString = mPhoneEditText.getText().toString();
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNumberString, null));
+        startActivity(intent);
     }
 }

@@ -17,7 +17,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.example.android.inventoryappp8p.data.GameContract;
 import com.example.android.inventoryappp8p.data.GameContract.GameEntry;
 
 /**
@@ -41,12 +43,12 @@ public class CatalogActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
 
-        // Setup FAB to open EditorActivity
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        // Setup FAB to open NewItemActivity
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
+                Intent intent = new Intent(CatalogActivity.this, NewItemActivity.class);
                 startActivity(intent);
             }
         });
@@ -98,6 +100,7 @@ public class CatalogActivity extends AppCompatActivity implements
         ContentValues values = new ContentValues();
         values.put(GameEntry.COLUMN_GAME_NAME, "Zelda: Breath of the Wild");
         values.put(GameEntry.COLUMN_GAME_PRICE, 59.99);
+        values.put(GameEntry.COLUMN_GAME_QUANTITY, "10");
         values.put(GameEntry.COLUMN_GAME_SUPPLIER, "Best Buy");
         values.put(GameEntry.COLUMN_GAME_SUPPLIER_PHONE, "458-867-5309");
 
@@ -140,13 +143,29 @@ public class CatalogActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    public void decreaseCount(int columnId, int quantity) {
+
+        quantity = quantity - 1;
+        if (quantity < 0) {
+            quantity = 0;
+        }
+        Toast.makeText(this, "Sold Id: " + String.valueOf(columnId), Toast.LENGTH_LONG).show();
+
+        ContentValues values = new ContentValues();
+        values.put(GameEntry.COLUMN_GAME_QUANTITY, quantity);
+
+        Uri updateUri = ContentUris.withAppendedId(GameContract.GameEntry.CONTENT_URI, columnId);
+
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         // Define a projection that specifies the columns from the table we care about.
         String[] projection = {
                 GameEntry._ID,
                 GameEntry.COLUMN_GAME_NAME,
-                GameEntry.COLUMN_GAME_PRICE};
+                GameEntry.COLUMN_GAME_PRICE,
+                GameEntry.COLUMN_GAME_QUANTITY};
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context

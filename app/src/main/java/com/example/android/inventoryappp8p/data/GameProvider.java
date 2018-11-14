@@ -148,6 +148,12 @@ public class GameProvider extends ContentProvider {
             throw new IllegalArgumentException("Game requires valid price");
         }
 
+        // Check that the quantity of the game in inventory is not null
+        Integer quantity = values.getAsInteger(GameEntry.COLUMN_GAME_QUANTITY);
+        if (quantity != null && quantity < 0) {
+            throw new IllegalArgumentException("Quantity of games in inventory required");
+        }
+
         // Check that the game supplier is not null
         String supplier = values.getAsString(GameEntry.COLUMN_GAME_SUPPLIER);
         if (supplier == null) {
@@ -160,7 +166,7 @@ public class GameProvider extends ContentProvider {
             throw new IllegalArgumentException("Game requires a valid supplier phone number");
         }
 
-        // Get writeable database
+        // Get writable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Insert the new game with the given values
@@ -215,9 +221,18 @@ public class GameProvider extends ContentProvider {
         // If the {@link GameEntry#COLUMN_GAME_PRICE} key is present,
         // check that the price value is valid.
         if (values.containsKey(GameEntry.COLUMN_GAME_PRICE)) {
-            Integer gender = values.getAsInteger(GameEntry.COLUMN_GAME_PRICE);
+            Double gender = values.getAsDouble(GameEntry.COLUMN_GAME_PRICE);
             if (gender == null) {
                 throw new IllegalArgumentException("Game requires valid price");
+            }
+        }
+
+        // If the {@link GameEntry#COLUMN_GAME_QUANTITY} key is present,
+        // check that the quantity value is valid.
+        if (values.containsKey(GameEntry.COLUMN_GAME_QUANTITY)) {
+            Integer quantity = values.getAsInteger(GameEntry.COLUMN_GAME_QUANTITY);
+            if (quantity != null && quantity < 0) {
+                throw new IllegalArgumentException("Can not have less than 0 games in inventory");
             }
         }
 
@@ -262,7 +277,7 @@ public class GameProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        // Get writeable database
+        // Get writable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Track the number of rows that were deleted

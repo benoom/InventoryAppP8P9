@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ import com.example.android.inventoryappp8p.data.GameContract.GameEntry;
  * how to create list items for each row of game data in the {@link Cursor}.
  */
 public class GameCursorAdapter extends CursorAdapter {
+    private Cursor mCursor;
 
     /**
      * Constructs a new {@link GameCursorAdapter}.
@@ -25,6 +27,7 @@ public class GameCursorAdapter extends CursorAdapter {
      */
     public GameCursorAdapter(Context context, Cursor c) {
         super(context, c, 0 /* flags */);
+
     }
 
     /**
@@ -53,7 +56,12 @@ public class GameCursorAdapter extends CursorAdapter {
      *                correct row.
      */
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, final Context context, Cursor cursor) {
+
+        // Initialize gameSoldBtn and cursor variables
+        Button gameSoldBtn;
+        this.mCursor = cursor;
+
         // Find individual views that we want to modify in the list item layout
         TextView nameTextView = view.findViewById(R.id.name);
         TextView summaryTextView = view.findViewById(R.id.summary);
@@ -69,6 +77,20 @@ public class GameCursorAdapter extends CursorAdapter {
         // Update the TextViews with the attributes for the current game
         nameTextView.setText(gameName);
         summaryTextView.setText(gamePrice);
+
+        gameSoldBtn = view.findViewById(R.id.game_sold_button);
+        gameSoldBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                int columnIdIndex = mCursor.getColumnIndex(GameEntry._ID);
+                int quantityIndex = mCursor.getColumnIndex(GameEntry.COLUMN_GAME_QUANTITY);
+                String column = mCursor.getString(columnIdIndex);
+                String currentQuantity = mCursor.getString(quantityIndex);
+                CatalogActivity catalogActivity = (CatalogActivity) context;
+                catalogActivity.decreaseCount(Integer.valueOf(column), Integer.valueOf(currentQuantity));
+            }
+        });
     }
 }
 
