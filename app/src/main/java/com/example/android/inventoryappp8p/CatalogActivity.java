@@ -155,7 +155,6 @@ public class CatalogActivity extends AppCompatActivity implements
         values.put(GameEntry.COLUMN_GAME_QUANTITY, quantity);
 
         Uri updateUri = ContentUris.withAppendedId(GameContract.GameEntry.CONTENT_URI, columnId);
-
     }
 
     @Override

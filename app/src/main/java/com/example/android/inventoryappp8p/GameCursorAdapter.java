@@ -64,19 +64,23 @@ public class GameCursorAdapter extends CursorAdapter {
 
         // Find individual views that we want to modify in the list item layout
         TextView nameTextView = view.findViewById(R.id.name);
-        TextView summaryTextView = view.findViewById(R.id.summary);
+        TextView priceTextView = view.findViewById(R.id.price);
+        TextView quantityTextView = view.findViewById(R.id.quantity);
 
         // Find the columns of game attributes that we're interested in
         int nameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_NAME);
         int priceColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_PRICE);
+        int quantityColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_QUANTITY);
 
         // Read the game attributes from the Cursor for the current game
         String gameName = cursor.getString(nameColumnIndex);
         String gamePrice = cursor.getString(priceColumnIndex);
+        String gameQuantity = cursor.getString(quantityColumnIndex);
 
         // Update the TextViews with the attributes for the current game
         nameTextView.setText(gameName);
-        summaryTextView.setText(gamePrice);
+        priceTextView.setText(gamePrice);
+        quantityTextView.setText(gameQuantity);
 
         gameSoldBtn = view.findViewById(R.id.game_sold_button);
         gameSoldBtn.setOnClickListener(new View.OnClickListener() {

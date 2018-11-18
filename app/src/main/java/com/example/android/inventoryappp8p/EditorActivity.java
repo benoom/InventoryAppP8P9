@@ -168,9 +168,9 @@ public class EditorActivity extends AppCompatActivity implements
             return;
         }
 
-        int price = 0;
+        double price = 0;
         if (!TextUtils.isEmpty(priceString)) {
-            price = Integer.parseInt(priceString);
+            price = Double.parseDouble(priceString);
             values.put(GameEntry.COLUMN_GAME_PRICE, price);
         } else {
             Toast.makeText(this, getString(R.string.update_price),
