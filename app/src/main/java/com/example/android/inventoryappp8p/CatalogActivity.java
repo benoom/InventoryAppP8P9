@@ -19,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.android.inventoryappp8p.data.GameContract;
 import com.example.android.inventoryappp8p.data.GameContract.GameEntry;
 
 /**
@@ -153,8 +152,6 @@ public class CatalogActivity extends AppCompatActivity implements
 
         ContentValues values = new ContentValues();
         values.put(GameEntry.COLUMN_GAME_QUANTITY, quantity);
-
-        Uri updateUri = ContentUris.withAppendedId(GameContract.GameEntry.CONTENT_URI, columnId);
     }
 
     @Override
